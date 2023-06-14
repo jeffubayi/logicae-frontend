@@ -1,91 +1,36 @@
 import Head from "next/head";
-import React, { useMemo, useEffect } from "react";
-import { GridValueGetterParams, GridRenderCellParams, GridRowParams } from "@mui/x-data-grid";
+import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useSession } from '@supabase/auth-helpers-react'
 import { useLocalStorage } from 'react-use';
 
 import { useGetJokesQuery } from "../redux/hooks";
-import DataGrid from "../components/table";
-import { renderViewsComponent } from "../components/viewsChip";
-import { JokesState } from "../types";
-import { timeConverter } from "../utility";
+import JokesDataGrid from "../components/table";
 
 export default function Jokes() {
   const router = useRouter();
   const session = useSession();
   const { data, isLoading, error } = useGetJokesQuery();
   const [token, setToken] = useLocalStorage<string>("access_token", "")
-  const rows = data || [];
-  const columns = useMemo(
-    () => [
-      { field: "Title", flex: 1, sortable: false },
-      { field: "Author", flex: 1, sortable: false },
-      {
-        field: "CreatedAt",
-        headerName: "Created Date",
-        sortable: true,
-        flex: 1,
-        valueGetter: (params: GridValueGetterParams) => {
-          return timeConverter(params.row.CreatedAt)
-        },
-      },
-      {
-        field: "Views",
-        sortable: true,
-        type: 'number',
-        renderCell: (params: GridRenderCellParams<JokesState>) => (
-          renderViewsComponent(params.row.Views)
-        ),
-      },
-    ],
-    []
-  );
 
-  //set access token to local storage
   useEffect(() => {
     setToken(session?.access_token)
     !token && router.push("/signin")
-  }, [session])
-
-//redirect to edit view
-  const handleTitleClick = (
-    params: GridRowParams,
-  ) => {
-    const { Title, Body, Author, Views, CreatedAt } = params.row
-    router.push(
-      {
-        pathname: "/jokes/[id]",
-        query: {
-          id: params.id,
-          Title,
-          Body,
-          Author,
-          Views,
-          CreatedAt,
-          method: "Edit",
-        },
-      },
-      `/jokes/edit/${params.id}`
-    );
-  };
-
+  }, [session,token])
 
   if (error) {
     return <div>Error: Unable to fetch jokes</div>;
   }
 
   return (
-    <div>
+    <React.Fragment>
       <Head>
         <title>Home | Logicea </title>
       </Head>
-      <DataGrid
-        rows={rows}
-        columns={columns}
+      <JokesDataGrid
+        rows={data??[]}
         loading={isLoading}
-        onRowClick={handleTitleClick}
       />
-    </div>
+    </React.Fragment>
   );
 }
