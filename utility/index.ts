@@ -1,8 +1,5 @@
-import moment from "moment"
-
 export function timeConverter(UNIX_timestamp: number) {
   var a = new Date(UNIX_timestamp);
-  console.log(`date`, a);
   var months = [
     "Jan",
     "Feb",
