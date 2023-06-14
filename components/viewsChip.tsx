@@ -1,8 +1,8 @@
 import { Chip } from "@mui/material";
 
-const tomato = '#c1004b';
-const orange = '#ff5722';
-const yellow = '#ffeb3b';
+const tomato = '#e21d1d';
+const orange = '#fa5f38';
+const yellow = '#f7af08';
 const green = '#4caf50';
 // Function to determine the color based on the number of views
 function getColorForViews(views: number) {
