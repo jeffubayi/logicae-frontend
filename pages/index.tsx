@@ -48,6 +48,28 @@ export default function Jokes() {
     !token && router.push("/signin")
   }, [session])
 
+//redirect to edit view
+  const handleTitleClick = (
+    params: GridRowParams,
+  ) => {
+    const { Title, Body, Author, Views, CreatedAt } = params.row
+    router.push(
+      {
+        pathname: "/jokes/[id]",
+        query: {
+          id: params.id,
+          Title,
+          Body,
+          Author,
+          Views,
+          CreatedAt,
+          method: "Edit",
+        },
+      },
+      `/jokes/edit/${params.id}`
+    );
+  };
+
 
   if (error) {
     return <div>Error: Unable to fetch jokes</div>;
@@ -62,6 +84,7 @@ export default function Jokes() {
         rows={rows}
         columns={columns}
         loading={isLoading}
+        onRowClick={handleTitleClick}
       />
     </div>
   );

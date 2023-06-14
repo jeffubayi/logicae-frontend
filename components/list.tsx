@@ -6,14 +6,18 @@ import AddIcon from '@mui/icons-material/Add';
 
 export default function CardTitle() {
   const session = useSession();
-  console.log(`session`, session)
   const router = useRouter();
   const handleAddJoke = () => {
     router.push(
       {
         pathname: "/jokes/[id]",
         query: {
-          id: 0,
+          id: null,
+          Views: null,
+          createdAt: null,
+          Title: "",
+          Body: "",
+          Author: "",
           method: "Create",
         },
       },
