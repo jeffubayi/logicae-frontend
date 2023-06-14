@@ -57,11 +57,7 @@ export default function SignIn() {
                     />
                 </Box>
             </Grid>
-            <Grid
-                item
-                xs={false}
-                sm={4}
-                md={8}
+            <Grid item xs={false} sm={4} md={8}
                 sx={{
                     backgroundImage: 'url(https://logicea.com/banner.jpg)',
                     backgroundRepeat: 'repeat',
