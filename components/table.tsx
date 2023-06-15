@@ -40,7 +40,7 @@ export default function Table(props: Props) {
                 sortable: true,
                 flex: 1,
                 valueGetter: (params: GridValueGetterParams) => {
-                    return timeConverter(params.row.CreatedAt)
+                    return timeConverter(params.row.CreatedAt) || "N/A"
                 },
             },
             {
