@@ -3,6 +3,8 @@ import { SessionContextProvider, Session } from '@supabase/auth-helpers-react';
 import { AppProps } from 'next/app';
 import { Toaster } from "react-hot-toast";
 import { Provider } from "react-redux";
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
 
 import { supabase } from "../utility/supabaseClient";
 import { store } from "../redux/store";
@@ -14,6 +16,12 @@ interface MyAppProps extends AppProps {
 
 const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
   const { Component, pageProps, initialSession, } = props;
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('sb-aaepbxpivppmvuaemajn-auth-token')
+    !token && router.push("/signin")
+  }, [router])
 
   return (
     <Provider store={store}>
@@ -24,7 +32,7 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
         <Layout>
           <Component {...pageProps} />
         </Layout>
-        <Toaster/>
+        <Toaster />
       </SessionContextProvider>
     </Provider>
   )
