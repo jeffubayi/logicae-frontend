@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import { DataGrid, GridToolbar, GridRowParams, GridColDef, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
+import { Box, Link } from '@mui/material';
 import { useLocalStorage } from 'react-use';
 import { useRouter } from "next/router";
 
@@ -24,12 +24,19 @@ export default function Table(props: Props) {
 
     const columns = useMemo(
         () => [
-            { field: "Title", flex: 1, sortable: false },
+            {
+                field: "Title",
+                flex: 1,
+                sortable: false,
+                renderCell: (params: GridRenderCellParams<JokesState>) => (
+                    <Link href="#">{params.row.Title}</Link>
+                ),
+            },
             { field: "Author", flex: 1, sortable: false },
             {
                 field: "CreatedAt",
                 headerName: "Created Date",
-                sort:"desc",
+                sort: "desc",
                 sortable: true,
                 flex: 1,
                 valueGetter: (params: GridValueGetterParams) => {
