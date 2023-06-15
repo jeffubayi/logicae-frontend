@@ -1,15 +1,14 @@
 import Head from "next/head";
-import React, { useEffect } from "react";
-import { Tooltip, DialogContent, Container } from "@mui/material";
+import React from "react";
 import { useRouter } from "next/router";
-import { Slide, AppBar, Grid, Dialog, Button, Toolbar, IconButton, DialogActions, Typography } from '@mui/material';
+import { Tooltip, DialogContent, Container,Slide, AppBar, Grid, Dialog, Button, Toolbar, IconButton, DialogActions, Typography } from '@mui/material';
 import { TextField } from "formik-mui";
 import toast from 'react-hot-toast';
 import CloseIcon from '@mui/icons-material/ArrowBackIos';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { TransitionProps } from '@mui/material/transitions';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { Formik, Field, Form, FormikHelpers } from 'formik';
+import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
@@ -20,16 +19,6 @@ import {
     useUpdateJokeMutation,
     useCreateJokeMutation,
 } from "../../redux/hooks";
-
-
-const Transition = React.forwardRef(function Transition(
-    props: TransitionProps & {
-        children: React.ReactElement;
-    },
-    ref: React.Ref<unknown>,
-) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
 
 
 export default function EditDialog() {
@@ -246,4 +235,14 @@ export default function EditDialog() {
         </LocalizationProvider >
     );
 }
+
+
+const Transition = React.forwardRef(function Transition(
+    props: TransitionProps & {
+        children: React.ReactElement;
+    },
+    ref: React.Ref<unknown>,
+) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 
