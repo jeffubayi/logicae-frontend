@@ -46,7 +46,7 @@ export default function EditDialog() {
 
     //go back logic
     const handleClose = () => {
-        router.back();
+        router.push("/jokes");
         setOpen(false);
     };
 
