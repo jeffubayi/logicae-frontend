@@ -20,8 +20,12 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
 
   useEffect(() => {
     const token = localStorage.getItem('sb-aaepbxpivppmvuaemajn-auth-token')
-    !token && router.push("/signin")
-  }, [router])
+    if (token) {
+      router.push("/jokes")
+    } else {
+      router.push("/signin")
+    }
+  }, [])
 
   return (
     <Provider store={store}>
