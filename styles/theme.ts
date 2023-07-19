@@ -15,6 +15,7 @@ export const getDesignTokens = (mode: PaletteMode) => ({
       ? {
           // palette values for light mode
           primary: { main: "#543894", secondary: "#aab4be" },
+          secondary: { main: "#000", secondary: "#aab4be" },
           warning: { main: "#c1004b" },
           contrastText: "#fff",
           text: {
@@ -30,6 +31,7 @@ export const getDesignTokens = (mode: PaletteMode) => ({
       : {
           // palette values for dark mode
           primary: { main: "#543894", secondary: "#475569" },
+          secondary: { main: "#fff", secondary: "#aab4be" },
           warning: { main: "#c1004b" },
           contrast: { main: "#1e293b" },
           divider: "#333333",
