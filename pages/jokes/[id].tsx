@@ -52,7 +52,7 @@ export default function EditDialog() {
 
     //delete joke
     const handleDelete = () => {
-        deleteJoke(id)
+        deleteJoke(29)
             .unwrap()
             .then(() => {
                 handleClose()

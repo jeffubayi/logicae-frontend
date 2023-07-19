@@ -1,15 +1,98 @@
 import Head from 'next/head';
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
-import { CssBaseline, Grid, Box, Paper, Typography, Avatar } from '@mui/material';
+import { CssBaseline, Grid, Box, Divider, Paper, Typography, Avatar, Button, Checkbox, FormControlLabel, Link } from '@mui/material';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Auth } from '@supabase/auth-ui-react'
-
+import router from 'next/router';
+import toast from 'react-hot-toast';
+import { Formik, Field, Form } from 'formik';
+import * as Yup from 'yup';
+import { TextField } from "formik-mui";
+import GoogleIcon from '@mui/icons-material/Google';
 
 export default function SignIn() {
     const supabase = useSupabaseClient()
     const theme = useTheme()
+    const [signUp, setSignUp] = React.useState(false);
+
+    const validationSchema = Yup.object({
+        email: Yup.string().email('Invalid email').required('Required'),
+        password: Yup.string().required('Required'),
+    });
+
+    const initialValues: any = {
+        email: "",
+        password: "",
+    }
+
+    const handleSignUp = async (values: any) => {
+        const {
+            email,
+            password,
+        } = values
+        const {
+            data: { session },
+            error,
+        } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: '/auth/success',
+            },
+        });
+
+        if (error) {
+            // handle the error however you like
+            toast.error(` ${error} `)
+            return;
+        }
+
+        // if there is a session it means that we do not need to verify the email beforehand
+        if (session) {
+            router.push('/');
+        } else {
+            toast.success(` Confirm your email `)
+            router.push('/profile');
+        }
+    };
+
+    const handleSignIn = async (values: any) => {
+        const {
+            email,
+            password,
+        } = values
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (error) {
+            toast.error(` ${error} `)
+            return;
+        }
+
+        if (data) {
+            toast.success(` logged in `)
+            router.push('/');
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                },
+            },
+        })
+
+
+    };
+
 
     return (
         <Grid container component="main" sx={{ height: '100vh' }}>
@@ -20,7 +103,7 @@ export default function SignIn() {
             <Grid item xs={12} sm={8} md={4} component={Paper} square>
                 <Box
                     sx={{
-                        my: 8,
+                        my: 6,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -32,12 +115,12 @@ export default function SignIn() {
                     >
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Logicea
+                        {signUp ? `Sign Up` : `Sign In`}
                     </Typography>
                 </Box>
 
-                <Box sx={{ mx: 6 }}>
-                    <Auth
+
+                {/* <Auth
                         supabaseClient={supabase}
                         appearance={{
                             theme: ThemeSupa,
@@ -54,8 +137,91 @@ export default function SignIn() {
                         providers={['google']}
                         redirectTo="/"
                         theme={theme.palette.mode}
-                    />
-                </Box>
+                    /> */}
+                <Formik
+                    initialValues={initialValues}
+                    onSubmit={signUp ? handleSignUp : handleSignIn}
+                    validationSchema={validationSchema}>
+                    {({
+                        isSubmitting,
+                    }) => (
+                        <Form>
+                            <Box sx={{ mx: 4 }}>
+                                <Button
+                                    startIcon={<GoogleIcon />}
+                                    fullWidth
+                                    variant="outlined"
+                                    color='secondary'
+                                    onClick={handleGoogleLogin}
+
+                                >
+                                    {`Sign In with Google`}
+                                </Button>
+                                <Divider orientation="horizontal" flexItem sx={{ my: 4 }}>
+                                    Or
+                                </Divider>
+                                <Grid container
+                                    rowSpacing={2}
+                                    columnSpacing={{ xs: 2, sm: 3, md: 5 }}
+                                >
+                                    <Grid item xs={12}>
+                                        <Field
+                                            component={TextField}
+                                            fullWidth
+                                            name="email"
+                                            label="Email Address"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} >
+                                        <Field
+                                            component={TextField}
+                                            fullWidth
+                                            name="password"
+                                            label="Password"
+                                            type="password"
+                                        />
+                                        <FormControlLabel
+                                            control={<Checkbox value="remember" color="primary" />}
+                                            label="Remember me"
+                                        />
+                                    </Grid>
+
+                                </Grid>
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{ mt: 3, mb: 2 }}
+                                >
+                                    {signUp ? `Sign Up` : `Sign In`}
+                                </Button>
+
+                                <Grid container
+                                    direction="column"
+                                    justifyContent="center"
+                                    alignItems="center" spacing={0.5}>
+
+                                    <Grid item xs={12} onClick={() => setSignUp(!signUp)}>
+                                        <Link href="#" variant="body2">
+                                            {signUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                                        </Link>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Link href="#" variant="body2">
+                                            Send Magic Link
+                                        </Link>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Link href="#" variant="body2">
+                                            Forgot Password
+                                        </Link>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Form>
+                    )}
+                </Formik>
             </Grid>
             <Grid item xs={false} sm={4} md={8}
                 sx={{

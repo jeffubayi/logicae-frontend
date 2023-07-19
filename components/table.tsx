@@ -16,6 +16,7 @@ interface Props {
 
 export default function Table(props: Props) {
     const { rows, loading } = props
+    
     const router = useRouter();
     const [paginationModel, setPaginationModel] = useLocalStorage("pagination", {
         pageSize: 5,
@@ -25,16 +26,16 @@ export default function Table(props: Props) {
     const columns = useMemo(
         () => [
             {
-                field: "Title",
+                field: "title",
                 flex: 1,
                 sortable: false,
                 renderCell: (params: GridRenderCellParams<JokesState>) => (
                     <Link href="#">{params.row.Title}</Link>
                 ),
             },
-            { field: "Author", flex: 1, sortable: false },
+            { field: "author", flex: 1, sortable: false },
             {
-                field: "CreatedAt",
+                field: "createdAt",
                 headerName: "Created Date",
                 sort: "desc",
                 sortable: true,
@@ -44,7 +45,7 @@ export default function Table(props: Props) {
                 },
             },
             {
-                field: "Views",
+                field: "views",
                 sortable: true,
                 type: 'number',
                 renderCell: (params: GridRenderCellParams<JokesState>) => (
@@ -63,7 +64,7 @@ export default function Table(props: Props) {
             quickFilterProps: { debounceMs: 500 },
         }
     }
-
+     const data = rows[29] || []
     //redirect to edit view
     const onRowClick = (
         params: GridRowParams,
@@ -97,7 +98,7 @@ export default function Table(props: Props) {
                 disableDensitySelector
                 disableColumnMenu
                 sortingOrder={['asc', 'desc']}
-                rows={rows}
+                rows={[]}
                 columns={columns}
                 loading={loading}
                 getRowId={(row) => row.id}
