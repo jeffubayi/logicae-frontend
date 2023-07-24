@@ -1,44 +1,24 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { JokesState,JokesValues} from "../types";
+import { supabase } from "../utility/supabaseClient";
 
-export const retoolApi = createApi({
-  reducerPath: "retoolApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://retoolapi.dev/zu9TVE" }),
-  tagTypes: ["Jokes"],
+const supabaseApi = createApi({
+  baseQuery: fetchBaseQuery(),
   endpoints: (builder) => ({
-    getJokes: builder.query<JokesState[], void>({
-      query: () => "jokes",
-      providesTags: ["Jokes"],
-    }),
-    createJoke: builder.mutation<void, Partial<JokesValues>>({
-      query: (newJoke) => ({
-        url: "jokes",
-        method: 'POST',
-        body: newJoke,
-      }),
-      invalidatesTags: ["Jokes"],
-    }),
-    deleteJoke: builder.mutation<JokesState[], number | string | string[] | undefined>({
-      query: (id) => ({
-        url: `jokes/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ["Jokes"],
-    }),
-    updateJoke: builder.mutation<JokesState[], { id: number | string | string[] | undefined; values: Partial<JokesValues> }>({
-      query: ({ id, values }) => ({
-        url: `jokes/${id}`,
-        method: 'PUT',
-        body: values ,
-      }),
-      invalidatesTags: ["Jokes"],
+    getJokes: builder.query({
+      queryFn: async () => {
+        const { data, error } = await supabase
+          .from("jokes")
+          .select('*')
+
+        if (error) {
+          throw { error };
+        }
+
+        return { data };
+      },
     }),
   }),
 });
 
-export const { 
-  useGetJokesQuery, 
-  useDeleteJokeMutation,
-  useUpdateJokeMutation,
-  useCreateJokeMutation,
- } = retoolApi;
+export const { useGetJokesQuery } = supabaseApi;
+export { supabaseApi };
