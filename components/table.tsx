@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import { DataGrid, GridToolbar, GridRowParams, GridColDef, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box, Link } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import { useLocalStorage } from 'react-use';
 import { useRouter } from "next/router";
 
@@ -10,13 +10,16 @@ import { renderViewsComponent } from "./viewsChip";
 import { timeConverter } from "../utility";
 
 interface Props {
-    rows: JokesState[];
+    rows: any;
     loading: boolean;
+    error: any;
 }
 
 export default function Table(props: Props) {
-    const { rows, loading } = props
-    
+    const { rows, loading, error } = props
+
+  console.log(`dataaaaR`, rows)
+
     const router = useRouter();
     const [paginationModel, setPaginationModel] = useLocalStorage("pagination", {
         pageSize: 5,
@@ -26,30 +29,28 @@ export default function Table(props: Props) {
     const columns = useMemo(
         () => [
             {
-                field: "title",
-                flex: 1,
+                field: "Category",
                 sortable: false,
-                renderCell: (params: GridRenderCellParams<JokesState>) => (
-                    <Link href="#">{params.row.Title}</Link>
+                renderCell: (params: GridRenderCellParams<any>) => (
+                    <Link href="#">{params.row.Category}</Link>
                 ),
             },
-            { field: "author", flex: 1, sortable: false },
+            { field: "Body", flex: 3, sortable: false },
             {
-                field: "createdAt",
+                field: "created_at",
                 headerName: "Created Date",
                 sort: "desc",
                 sortable: true,
-                flex: 1,
                 valueGetter: (params: GridValueGetterParams) => {
-                    return timeConverter(params.row.CreatedAt) || "N/A"
+                    return timeConverter(params.row.created_at) || "N/A"
                 },
             },
             {
-                field: "views",
+                field: "Likes",
                 sortable: true,
                 type: 'number',
-                renderCell: (params: GridRenderCellParams<JokesState>) => (
-                    renderViewsComponent(params.row.Views)
+                renderCell: (params: GridRenderCellParams<any>) => (
+                    renderViewsComponent(params.row.likes)
                 ),
             },
         ],
@@ -64,7 +65,7 @@ export default function Table(props: Props) {
             quickFilterProps: { debounceMs: 500 },
         }
     }
-     const data = rows[29] || []
+    const data = rows[29] || []
     //redirect to edit view
     const onRowClick = (
         params: GridRowParams,
@@ -90,31 +91,31 @@ export default function Table(props: Props) {
     return (
         <Box sx={{ p: 2 }}>
             <CardTitle />
-            <DataGrid
-                autoHeight
-                pagination
-                showCellVerticalBorder
-                disableColumnSelector
-                disableDensitySelector
-                disableColumnMenu
-                sortingOrder={['asc', 'desc']}
-                rows={[]}
-                columns={columns}
-                loading={loading}
-                getRowId={(row) => row.id}
-                onRowClick={onRowClick}
-                pageSizeOptions={[5, 10]}
-                paginationModel={paginationModel}
-                onPaginationModelChange={setPaginationModel}
-                slots={{ toolbar: GridToolbar }}
-                slotProps={filterProps}
-                initialState={{
-                    sorting: {
-                        sortModel: [{ field: 'Views', sort: 'desc' }],
-                    },
-                }}
-                sx={{ borderRadius: "1rem", bgcolor: 'background.paper' }}
-            />
+            {error ? (
+                <Typography>Unable to Fetch Jokes</Typography>
+            ) : (
+                <DataGrid
+                    autoHeight
+                    pagination
+                    sortingOrder={['asc', 'desc']}
+                    rows={rows}
+                    columns={columns}
+                    loading={loading}
+                    getRowId={(row) => row.id}
+                    onRowClick={onRowClick}
+                    pageSizeOptions={[5, 10]}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={filterProps}
+                    initialState={{
+                        sorting: {
+                            sortModel: [{ field: 'Views', sort: 'desc' }],
+                        },
+                    }}
+                    sx={{ borderRadius: "1rem", bgcolor: 'background.paper' }}
+                />
+            )}
         </Box>
     );
 }

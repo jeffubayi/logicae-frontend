@@ -155,10 +155,10 @@ export default function SignIn() {
                                     onClick={handleGoogleLogin}
 
                                 >
-                                    {`Sign In with Google`}
+                                    {` Google`}
                                 </Button>
                                 <Divider orientation="horizontal" flexItem sx={{ my: 4 }}>
-                                    Or
+                                Or with email and password
                                 </Divider>
                                 <Grid container
                                     rowSpacing={2}
@@ -204,7 +204,7 @@ export default function SignIn() {
 
                                     <Grid item xs={12} onClick={() => setSignUp(!signUp)}>
                                         <Link href="#" variant="body2">
-                                            {signUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                                            {signUp ? "Have an account? Log in now" : "Don't have an account? Sign Up"}
                                         </Link>
                                     </Grid>
                                     <Grid item xs={12}>
