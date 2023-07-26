@@ -1,19 +1,17 @@
 export type JokesState = {
   id: number;
-  Title: string;
-  Author: string;
+  Category: string;
   Body: string;
-  Views: number;
-  CreatedAt: Date | number;
+  likes: number;
+  created_at: Date | number;
 };
 
 export type JokesValues = {
   id?: number | string | undefined;
-  Title: string | string[] | undefined;
-  Author: string | string[] | undefined;
+  Category: string | string[] | undefined;
   Body?: string | string[] | undefined;
-  Views: string | string[] | undefined;
-  CreatedAt?: Date | string | string[];
+  likes: string | string[] | undefined;
+  created_at?: Date | string | string[];
 };
 
 export interface UserProfileState {
