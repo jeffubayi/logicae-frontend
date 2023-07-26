@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { DataGrid, GridToolbar, GridRowParams, GridRowId, GridActionsCellItem, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar, GridRowParams, GridRowId, GridActionsCellItem, GridColDef, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box, Link, Typography } from '@mui/material';
 import { useLocalStorage } from 'react-use';
 import { useRouter } from "next/router";
@@ -30,6 +30,7 @@ export default function Table(props: Props) {
     });
 
     const deleteUser = async (id: any) => {
+        console.log(`id`,id)
         const { error } = await supabase
             .from('jokes')
             .delete()
@@ -52,29 +53,29 @@ export default function Table(props: Props) {
     );
 
     const editLikes = React.useCallback(
-        (params: JokesState, type: string) => () => {
+        (params: any, type: string) => () => {
             upvoteJoke(params, type)
         },
         [],
     );
 
 
-    const upvoteJoke = async (params: JokesState, type: string) => {
+    const upvoteJoke = async (params: any, type: string) => {
         const { error } = await supabase
             .from('jokes')
-            .update({ likes: type === 'asc' ? params?.likes + 1 : params?.likes - 1 })
+            .update({ likes: type === "liked" ? params.row.likes + 1 : type === "disliked" && params.row.likes !== 0 || null ? params.row.likes - 1 : 0 })
             .eq('id', params.id)
 
         if (error) {
-            toast.error(`Joke ${params?.id} failed to upvote`)
+            toast.error(`Failed to ${type} ${params.row.Category}`)
             console.log(error)
         } else {
-            toast.success(`Joke ${params?.id} successfully upvoted`)
+            toast.success(` You ${type} a ${params.row.Category} successfully`)
         }
 
     };
 
-    const columns = useMemo(
+    const columns = useMemo<GridColDef<JokesState>[]>(
         () => [
             {
                 field: "Category",
@@ -87,14 +88,13 @@ export default function Table(props: Props) {
             {
                 field: "created_at",
                 headerName: "Created Date",
-                sort: "desc",
-                sortable: true,
                 valueGetter: (params: GridValueGetterParams) => {
                     return timeConverter(params.row.created_at) || "N/A"
                 },
             },
             {
                 field: "Likes",
+                sort: "asc",
                 sortable: true,
                 type: 'number',
                 renderCell: (params: GridRenderCellParams<any>) => (
@@ -110,13 +110,13 @@ export default function Table(props: Props) {
                         icon={<UpIcon />}
                         label="Like"
                         showInMenu={true}
-                        onClick={editLikes(params, 'asc')}
+                        onClick={editLikes(params, 'liked')}
                     />,
                     <GridActionsCellItem
                         icon={<DownIcon />}
                         label="Dislike"
                         showInMenu={true}
-                        onClick={editLikes(params, 'desc')}
+                        onClick={editLikes(params, 'disliked')}
                     />,
                     <GridActionsCellItem
                         icon={<DeleteIcon color="warning" />}
