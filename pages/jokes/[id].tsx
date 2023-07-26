@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
 import { useRouter } from "next/router";
-import { Tooltip, DialogContent, Container,Slide, AppBar, Grid, Dialog, Button, Toolbar, IconButton, DialogActions, Typography } from '@mui/material';
+import { Tooltip, DialogContent, Container, Slide, AppBar, Grid, Dialog, Button, Toolbar, IconButton, DialogActions, Typography } from '@mui/material';
 import { TextField } from "formik-mui";
 import toast from 'react-hot-toast';
 import CloseIcon from '@mui/icons-material/ArrowBackIos';
@@ -14,34 +14,22 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 import { JokesValues } from "../../types";
-import {
-    useDeleteJokeMutation,
-    useUpdateJokeMutation,
-    useCreateJokeMutation,
-} from "../../redux/hooks";
+import { supabase } from "../../utility/supabaseClient";
 
 
 export default function EditDialog() {
     const router = useRouter();
-    const [deleteJoke] = useDeleteJokeMutation();
-    const [updateJoke] = useUpdateJokeMutation();
-    const [createJoke] = useCreateJokeMutation();
     const [open, setOpen] = React.useState(true);
-    const { id, method, Title, Author, Body, Views, CreatedAt } = router.query;
+    const { id, method, Category, Body, likes } = router.query;
     //initial form values
     const initialValues: JokesValues = {
-        Title,
-        Body,
-        Author,
-        Views,
-        CreatedAt: CreatedAt || new Date(),
+        Category, Body, likes,
     }
     //form validation
     const validationSchema = Yup.object({
-        Title: Yup.string().required('Required'),
+        Category: Yup.string().required('Required'),
         Body: Yup.string().required('Required'),
-        Author: Yup.string().email('Invalid email').required('Required'),
-        Views: Yup.number().required('Required'),
+        likes: Yup.number().required('Required'),
     });
 
     //go back logic
@@ -51,17 +39,20 @@ export default function EditDialog() {
     };
 
     //delete joke
-    const handleDelete = () => {
-        deleteJoke(29)
-            .unwrap()
-            .then(() => {
-                handleClose()
-                toast.success(`Joke ${Title} successfully deleted`)
-            })
-            .catch((error) => {
-                toast.error(`Joke ${Title} failed to delete`)
-                console.log(error)
-            });
+    const handleDelete = async () => {
+        const { error } = await supabase
+            .from('jokes')
+            .delete()
+            .eq('id', 1)
+
+        if (error) {
+            toast.error(`Joke ${Category} failed to delete`)
+            console.log(error)
+        } else {
+            handleClose()
+            toast.success(`Joke ${Category} successfully deleted`)
+        }
+
     };
 
 
@@ -69,31 +60,37 @@ export default function EditDialog() {
     const handleSubmit = async (
         values: JokesValues,
     ) => {
+        console.log(`VAL`, values)
         if (method === "Edit" && id != null) {
-            await updateJoke({ id, values })
-                .unwrap()
-                .then(() => {
-                    handleClose()
-                    toast.success(`Joke ${id} successfully edited`)
-                })
-                .catch((error) => {
-                    toast.error(`Joke ${id} failed to edit`)
-                    console.log(error)
-                });
+            const { error } = await supabase
+                .from('jokes')
+                .upsert({ id, ...values })
+                .select()
+
+            if (error) {
+                toast.error(`Joke ${id} failed to edit`)
+                console.log(error)
+            } else {
+                handleClose()
+                toast.success(`Joke ${id} successfully edited`)
+            }
+
         } else {
-            await createJoke({
-                ...values,
-                id: Math.floor(Math.random() * 100),
-            })
-                .unwrap()
-                .then(() => {
-                    handleClose()
-                    toast.success(` ${values.Title} successfully added`)
+            const { error } = await supabase
+                .from('jokes')
+                .insert({
+                    ...values,
+                    id: Math.floor(Math.random() * 100),
+                    created_at: new Date(),
                 })
-                .catch((error) => {
-                    toast.error(`Error creating joke`)
-                    console.log(error)
-                });
+
+            if (error) {
+                toast.error(`Error creating joke`)
+                console.log(error)
+            } else {
+                handleClose()
+                toast.success(` ${values.Category} successfully added`)
+            }
         }
     };
 
@@ -162,12 +159,12 @@ export default function EditDialog() {
                                             <Field
                                                 component={TextField}
                                                 fullWidth
-                                                name="Title"
-                                                label="Title"
+                                                name="Category"
+                                                label="Category"
                                                 type="text"
                                             />
                                         </Grid>
-                                        <Grid item xs={12} >
+                                        {/* <Grid item xs={12} >
                                             <Field
                                                 component={TextField}
                                                 fullWidth
@@ -175,7 +172,7 @@ export default function EditDialog() {
                                                 label="Author"
                                                 type="email"
                                             />
-                                        </Grid>
+                                        </Grid> */}
                                         <Grid item xs={12} >
                                             <Field
                                                 component={TextField}
@@ -186,21 +183,21 @@ export default function EditDialog() {
                                                 rows={4}
                                             />
                                         </Grid>
-                                        <Grid item xs={12} md={4.5}>
+                                        {/* <Grid item xs={12} md={4.5}>
                                             <Field
                                                 component={DesktopDatePicker}
                                                 label="Created At"
-                                                name="CreatedAt"
+                                                name="created_at"
                                                 type='date'
                                             />
-                                        </Grid>
+                                        </Grid> */}
 
                                         <Grid item xs={12} md={7.5} >
                                             <Field
                                                 component={TextField}
                                                 fullWidth
-                                                name="Views"
-                                                label="Views"
+                                                name="likes"
+                                                label="Likes"
                                                 type="number"
                                                 InputProps={{ inputProps: { min: 0, max: 100 } }} />
                                         </Grid>
