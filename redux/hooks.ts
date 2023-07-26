@@ -3,6 +3,7 @@ import { supabase } from "../utility/supabaseClient";
 
 const supabaseApi = createApi({
   baseQuery: fetchBaseQuery(),
+  tagTypes: ["Jokes"],
   endpoints: (builder) => ({
     getJokes: builder.query({
       queryFn: async () => {
@@ -16,6 +17,7 @@ const supabaseApi = createApi({
 
         return { data };
       },
+    providesTags: ["Jokes"],
     }),
   }),
 });
