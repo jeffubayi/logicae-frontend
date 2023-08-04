@@ -1,5 +1,5 @@
-import React, { useMemo, useEffect } from 'react';
-import { DataGrid, GridToolbar, GridRowParams, GridRowId, GridActionsCellItem, GridColDef, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
+import React, { useMemo } from 'react';
+import { DataGrid, GridToolbar, GridRowId, GridActionsCellItem, GridColDef, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box, Link, Chip, Paper } from '@mui/material';
 import { useLocalStorage } from 'react-use';
 import { useRouter } from "next/router";
@@ -16,6 +16,7 @@ import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDiss
 import { styled } from '@mui/material/styles';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import { useUser } from '@supabase/auth-helpers-react'
 
 const StyledRating = styled(Rating)({
     '& .MuiRating-iconFilled': {
@@ -33,6 +34,7 @@ interface Props {
 }
 
 export default function Table(props: Props) {
+    const user = useUser();
     const { rows, loading, error } = props
     const [paginationModel, setPaginationModel] = useLocalStorage("pagination", {
         pageSize: 5,
@@ -49,16 +51,20 @@ export default function Table(props: Props) {
 
 
     const deleteUser = async (id: any) => {
-        const { error } = await supabase
-            .from('jokes')
-            .delete()
-            .eq('id', id)
+        if (user?.id) {
+            const { error } = await supabase
+                .from('jokes')
+                .delete()
+                .eq('id', id)
 
-        if (error) {
-            toast.error(`Joke ${id} failed to delete`)
-            console.log(error)
+            if (error) {
+                toast.error(`Joke ${id} failed to delete`)
+                console.log(error)
+            } else {
+                toast.success(`Joke ${id} successfully deleted`)
+            }
         } else {
-            toast.success(`Joke ${id} successfully deleted`)
+            toast.error(`Please login to delete`)
         }
 
     };
@@ -124,7 +130,7 @@ export default function Table(props: Props) {
                         readOnly
                         value={params.row.likes}
                         getLabelText={(value: number) => `${value} Heart${value !== 1 ? 's' : ''}`}
-                        icon={<EmojiEmotionsIcon  fontSize="inherit" />}
+                        icon={<EmojiEmotionsIcon fontSize="inherit" />}
                         emptyIcon={<SentimentVeryDissatisfiedIcon fontSize="inherit" />}
                     />
 
@@ -147,12 +153,12 @@ export default function Table(props: Props) {
                         showInMenu={true}
                         onClick={editLikes(params, 'disliked')}
                     />,
-                    // <GridActionsCellItem
-                    //     icon={<DeleteIcon color="warning" />}
-                    //     label="Delete"
-                    //     showInMenu={true}
-                    //     onClick={deleteJoke(params.id)}
-                    // />
+                    <GridActionsCellItem
+                        icon={<DeleteIcon color="warning" />}
+                        label="Delete"
+                        showInMenu={true}
+                        onClick={deleteJoke(params.id)}
+                    />
                 ],
             },
         ], [deleteJoke, editLikes]);

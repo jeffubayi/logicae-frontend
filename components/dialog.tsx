@@ -8,7 +8,7 @@ import { TextField } from "formik-mui";
 import toast from 'react-hot-toast';
 import { JokesValues } from "../types";
 import { supabase } from "../utility/supabaseClient";
-
+import { useUser } from '@supabase/auth-helpers-react'
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -27,7 +27,7 @@ export interface DialogTitleProps {
 
 function BootstrapDialogTitle(props: DialogTitleProps) {
     const { children, onClose, ...other } = props;
-
+    const user = useUser();
     return (
         <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
             {children}
@@ -51,7 +51,7 @@ function BootstrapDialogTitle(props: DialogTitleProps) {
 
 export default function ActionDialog(props: { open: any; handleClose: any; data: any; method: any }) {
     const { open, handleClose, data, method } = props
-    console.log(`data`, data)
+    const user = useUser();
     const {id, Category, Body } = data
 
     const validationSchema = Yup.object({
@@ -62,7 +62,7 @@ export default function ActionDialog(props: { open: any; handleClose: any; data:
     const handleSubmit = async (
         values: JokesValues,
     ) => {
-        if (method === "Edit" && id != null) {
+        if (method === "Edit" && id != null ) {
             const { error } = await supabase
                 .from('jokes')
                 .upsert({ id, ...values })
@@ -158,7 +158,7 @@ export default function ActionDialog(props: { open: any; handleClose: any; data:
                                     autoFocus
                                     fullWidth
                                     type="submit"
-                                    disabled={isSubmitting}
+                                    disabled={user?.id ? isSubmitting : !user?.id}
                                     sx={{ color: `#fff` }}
                                     variant="contained"
                                 >
