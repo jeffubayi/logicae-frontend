@@ -2,9 +2,7 @@ import Head from 'next/head';
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { CssBaseline, Grid, Box, Divider, Paper, Typography, Avatar, Button, Checkbox, FormControlLabel, Link } from '@mui/material';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { Auth } from '@supabase/auth-ui-react'
 import router from 'next/router';
 import toast from 'react-hot-toast';
 import { Formik, Field, Form } from 'formik';
@@ -53,8 +51,8 @@ export default function SignIn() {
         if (session) {
             router.push('/');
         } else {
-            toast.success(` Confirm your email `)
-            router.push('/profile');
+            toast.success(`Successful signed up with ${email}`)
+            router.push('/verify');
         }
     };
 

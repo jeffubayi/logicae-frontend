@@ -1,6 +1,5 @@
-import Head from "next/head";
-import React from "react";
 
+import React from "react";
 import { useGetJokesQuery } from "../redux/hooks";
 import DataGrid from "../components/table";
 import { supabase } from "../utility/supabaseClient";
@@ -28,16 +27,11 @@ export default function Jokes() {
 
 
   return (
-    <React.Fragment>
-      <Head>
-        <title>Jokes | Logicea </title>
-      </Head>
-      <DataGrid
-        rows={data ?? []}
-        loading={isLoading}
-        error={error}
-      />
-    </React.Fragment>
+    <DataGrid
+      rows={data ?? []}
+      loading={isLoading}
+      error={error}
+    />
   );
 }
 
