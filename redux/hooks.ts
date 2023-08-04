@@ -22,5 +22,5 @@ const supabaseApi = createApi({
   }),
 });
 
-export const { useGetJokesQuery } = supabaseApi;
+export const { useGetJokesQuery} = supabaseApi;
 export { supabaseApi };
