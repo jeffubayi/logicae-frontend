@@ -28,7 +28,7 @@ export default function CardTitle({ handleAddJoke }: { handleAddJoke: any }) {
         <ListItemText
           primary={
             <Typography color="text.primary">
-              {session ? "Logged in as:" : "Please login to add jokes"}
+              {session ? "Logged in as:" : "No User found!!"}
             </Typography>
           }
           secondary={
@@ -38,7 +38,7 @@ export default function CardTitle({ handleAddJoke }: { handleAddJoke: any }) {
               variant="body2"
               color="text.primary"
             >
-              {session?.user.email}
+              {session?.user.email || "Please login to add jokes"}
             </Typography>
           }
         />

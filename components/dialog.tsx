@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
-import { Tooltip, DialogContent, MenuItem, Container, Slide, AppBar, Grid, Dialog, Button, Toolbar, IconButton, DialogActions, Typography } from '@mui/material';
+import { DialogTitle ,Tooltip, DialogContent, MenuItem, Container, Slide, AppBar, Grid, Dialog, Button, Toolbar, IconButton, DialogActions, Typography } from '@mui/material';
 import { TextField } from "formik-mui";
 import toast from 'react-hot-toast';
 import { JokesValues } from "../types";

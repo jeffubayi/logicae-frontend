@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Head from "next/head";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { Box } from "@mui/material";
 import Container from '@mui/material/Container';
@@ -37,6 +38,9 @@ export default function Layout({ children }: Props) {
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
   return (
     <ThemeProvider theme={theme}>
+      <Head>
+        <title>Jokes | Logicea </title>
+      </Head>
       {currentRoute !== "/signin" && <Navbar />}
       <Box component="main">
         <Container disableGutters maxWidth={currentRoute == "/signin" ? "xl" : "md"} component="main">

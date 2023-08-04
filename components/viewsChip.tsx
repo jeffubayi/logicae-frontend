@@ -27,9 +27,9 @@ export function renderViewsComponent(views: any) {
     label={views}
     sx={{
       borderRadius: "10px", 
-      color: color,
+      color: "#543894",
       backgroundColor: "background.default",
-      borderColor: color,
+      border: "1px solid #543894",
       fontWeight: "bold"
     }}
   />;

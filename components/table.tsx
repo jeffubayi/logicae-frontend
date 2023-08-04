@@ -4,16 +4,27 @@ import { Box, Link, Chip, Paper } from '@mui/material';
 import { useLocalStorage } from 'react-use';
 import { useRouter } from "next/router";
 import toast from 'react-hot-toast';
-
+import Rating from '@mui/material/Rating';
 import { supabase } from "../utility/supabaseClient";
 import DeleteIcon from '@mui/icons-material/Delete';
-import UpIcon from '@mui/icons-material/ThumbUp';
-import DownIcon from '@mui/icons-material/ThumbDown';
 import { JokesState } from "../types";
 import CardTitle from "./list";
 import { renderViewsComponent } from "./viewsChip";
 import { timeConverter } from "../utility";
 import ActionDialog from '../components/dialog';
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
+import { styled } from '@mui/material/styles';
+import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+
+const StyledRating = styled(Rating)({
+    '& .MuiRating-iconFilled': {
+        color: '#ffc107',
+    },
+    '& .MuiRating-iconHover': {
+        color: '#ffcd38',
+    },
+});
 
 interface Props {
     rows: any;
@@ -91,7 +102,9 @@ export default function Table(props: Props) {
                     renderViewsComponent(params.row.Category)
                 ),
             },
-            { field: "Body", flex: 3, sortable: false },
+            { field: "Body", flex: 5, sortable: false },
+
+
             {
                 field: "created_at",
                 sortable: false,
@@ -102,34 +115,44 @@ export default function Table(props: Props) {
             },
             {
                 field: "Likes",
-                sortable: true,
+                sortable: false,
                 renderCell: (params: GridRenderCellParams<any>) => (
-                    <Chip size="small" label={params.row.likes} />
+                    // <Rating size="small" name="read-only" value={params.row.likes} readOnly />
+                    <StyledRating
+                        size="small"
+                        name="customized-color"
+                        readOnly
+                        value={params.row.likes}
+                        getLabelText={(value: number) => `${value} Heart${value !== 1 ? 's' : ''}`}
+                        icon={<EmojiEmotionsIcon  fontSize="inherit" />}
+                        emptyIcon={<SentimentVeryDissatisfiedIcon fontSize="inherit" />}
+                    />
 
                 ),
             },
             {
                 field: 'actions',
                 type: 'actions',
-                flex: 1,
+                width: 10,
                 getActions: (params: any) => [
                     <GridActionsCellItem
-                        icon={<UpIcon />}
+                        icon={<SentimentVerySatisfiedIcon color="success" />}
                         label="Like"
                         showInMenu={true}
                         onClick={editLikes(params, 'liked')}
                     />,
                     <GridActionsCellItem
-                        icon={<DownIcon />}
+                        icon={<SentimentVeryDissatisfiedIcon color="warning" />}
                         label="Dislike"
                         showInMenu={true}
                         onClick={editLikes(params, 'disliked')}
                     />,
-                    <GridActionsCellItem
-                        icon={<DeleteIcon color="warning" />}
-                        label="Delete"
-                        onClick={deleteJoke(params.id)}
-                    />,
+                    // <GridActionsCellItem
+                    //     icon={<DeleteIcon color="warning" />}
+                    //     label="Delete"
+                    //     showInMenu={true}
+                    //     onClick={deleteJoke(params.id)}
+                    // />
                 ],
             },
         ], [deleteJoke, editLikes]);
@@ -195,11 +218,6 @@ export default function Table(props: Props) {
                     onPaginationModelChange={setPaginationModel}
                     slots={{ toolbar: GridToolbar }}
                     slotProps={filterProps}
-                    initialState={{
-                        sorting: {
-                            sortModel: [{ field: 'Likes', sort: 'asc' }],
-                        },
-                    }}
                     sx={{ borderRadius: "1rem", bgcolor: 'background.paper' }}
                 />
             )}
