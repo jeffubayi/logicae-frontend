@@ -14,6 +14,7 @@ export default function Jokes() {
     const { data, error } = await supabase
       .from("jokes")
       .select('*')
+      .order('likes', { ascending: false})
 
     setData(data);
     setError(error);
