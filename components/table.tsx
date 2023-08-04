@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import { DataGrid, GridToolbar, GridRowParams, GridRowId, GridActionsCellItem, GridColDef, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Link, Chip, Paper } from '@mui/material';
 import { useLocalStorage } from 'react-use';
 import { useRouter } from "next/router";
 import toast from 'react-hot-toast';
@@ -13,6 +13,7 @@ import { JokesState } from "../types";
 import CardTitle from "./list";
 import { renderViewsComponent } from "./viewsChip";
 import { timeConverter } from "../utility";
+import ActionDialog from '../components/dialog';
 
 interface Props {
     rows: any;
@@ -22,15 +23,21 @@ interface Props {
 
 export default function Table(props: Props) {
     const { rows, loading, error } = props
-
-    const router = useRouter();
     const [paginationModel, setPaginationModel] = useLocalStorage("pagination", {
         pageSize: 5,
         page: 0,
     });
+    const [open, setOpen] = React.useState(false);
+    const [data, setData] = React.useState<any | undefined>();
+    const [method, setMethod] = React.useState('');
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+
 
     const deleteUser = async (id: any) => {
-        console.log(`id`,id)
         const { error } = await supabase
             .from('jokes')
             .delete()
@@ -81,24 +88,24 @@ export default function Table(props: Props) {
                 field: "Category",
                 sortable: false,
                 renderCell: (params: GridRenderCellParams<any>) => (
-                    <Link href="#">{params.row.Category}</Link>
+                    renderViewsComponent(params.row.Category)
                 ),
             },
             { field: "Body", flex: 3, sortable: false },
             {
                 field: "created_at",
-                headerName: "Created Date",
+                sortable: false,
+                headerName: "Created At",
                 valueGetter: (params: GridValueGetterParams) => {
                     return timeConverter(params.row.created_at) || "N/A"
                 },
             },
             {
                 field: "Likes",
-                sort: "asc",
                 sortable: true,
-                type: 'number',
                 renderCell: (params: GridRenderCellParams<any>) => (
-                    renderViewsComponent(params.row.likes)
+                    <Chip size="small" label={params.row.likes} />
+
                 ),
             },
             {
@@ -127,6 +134,7 @@ export default function Table(props: Props) {
             },
         ], [deleteJoke, editLikes]);
 
+
     const filterProps = {
         toolbar: {
             csvOptions: { disableToolbarButton: true },
@@ -135,34 +143,45 @@ export default function Table(props: Props) {
             quickFilterProps: { debounceMs: 500 },
         }
     }
-    const data = rows[29] || []
+
+
     //redirect to edit view
     const onRowClick = (
-        params: GridRowParams,
+        params: any
     ) => {
-        const { Category, Body, likes, created_at } = params.row
-        router.push(
-            {
-                pathname: "/jokes/[id]",
-                query: {
-                    id: params.id,
-                    Category,
-                    Body,
-                    likes,
-                    method: "Edit",
-                },
-            },
-            `/jokes/edit/${params.id}`
-        );
+        setOpen(true);
+        setData(params.row)
+        setMethod('Edit')
+    };
+
+    const addJoke = () => {
+        setOpen(true);
+        setData({
+            Category: "",
+            Body: "",
+            id: null,
+        })
+        setMethod('Create')
     };
 
     return (
         <Box sx={{ p: 2 }}>
-            <CardTitle />
+            {open &&
+                <ActionDialog
+                    open={open}
+                    handleClose={handleClose}
+                    data={data}
+                    method={method}
+                />
+            }
+            <CardTitle handleAddJoke={addJoke} />
             {error ? (
-                <Typography>Unable to Fetch Jokes</Typography>
+                <Paper>Unable to Fetch Jokes</Paper>
             ) : (
                 <DataGrid
+                    disableColumnMenu
+                    disableDensitySelector
+                    disableColumnSelector
                     autoHeight
                     pagination
                     sortingOrder={['asc', 'desc']}
@@ -178,7 +197,7 @@ export default function Table(props: Props) {
                     slotProps={filterProps}
                     initialState={{
                         sorting: {
-                            sortModel: [{ field: 'Views', sort: 'desc' }],
+                            sortModel: [{ field: 'Likes', sort: 'asc' }],
                         },
                     }}
                     sx={{ borderRadius: "1rem", bgcolor: 'background.paper' }}

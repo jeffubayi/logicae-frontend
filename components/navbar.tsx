@@ -7,6 +7,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useDispatch } from 'react-redux';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import { useSession } from '@supabase/auth-helpers-react'
 
 import { clearUserProfile } from '../redux/userProfileSlice'
 import { toggleColorMode } from '../redux/themeSlice';
@@ -18,6 +19,7 @@ export default function Navbar() {
     const isSmallScreen = useMediaQuery("(min-width:500px)");
     const supabaseClient = useSupabaseClient()
     const dispatch = useDispatch();
+    const session = useSession();
 
     const handleDarkModeToggle = () => {
         dispatch(toggleColorMode());
@@ -52,7 +54,7 @@ export default function Navbar() {
                                 Logicea
                             </Typography>}
                     </Box>
-                    <Box sx={{ display: 'flex' ,pl: 4}}>
+                    <Box sx={{ display: 'flex', pl: 4 }}>
                         <Tooltip title="Toggle theme">
                             <IconButton onClick={handleDarkModeToggle} color="inherit">
                                 {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -61,12 +63,12 @@ export default function Navbar() {
                     </Box>
                     <Button
                         variant="contained"
-                        color="warning"
+                        color={session ?  "warning" : "primary" }
                         onClick={handleLogout}
                         size="small"
                         sx={{ borderRadius: "0.4rem" }}
                     >
-                        Logout
+                       {session ?   "Logout" :"Login"}
                     </Button>
                 </Toolbar>
             </AppBar>
